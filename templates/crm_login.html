@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM Login - Terra Zen</title>
+    <!-- Font Awesome con CDN más confiable -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" 
+          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" 
+          crossorigin="anonymous" 
+          referrerpolicy="no-referrer" />
     <style>
         body { 
             font-family: Arial, sans-serif; 
-            padding: 50px; 
+            padding: 20px; 
             text-align: center; 
             background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
             color: #f4f4f4;
@@ -13,13 +20,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            margin: 0;
         }
         
         .login-container {
             background: #1a1a1a;
             border: 1px solid #444;
             border-radius: 16px;
-            padding: 40px;
+            padding: 40px 30px;
             max-width: 400px;
             width: 90%;
             box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
@@ -28,6 +36,7 @@
         h2 {
             color: #ffd700;
             margin-bottom: 20px;
+            font-size: 1.5rem;
         }
         
         form { 
@@ -37,7 +46,7 @@
         
         .input-group {
             position: relative;
-            margin: 10px 0;
+            margin: 15px 0;
         }
         
         input { 
@@ -49,11 +58,13 @@
             color: #f4f4f4;
             font-size: 1rem;
             box-sizing: border-box;
+            transition: border-color 0.3s ease;
         }
         
         input:focus {
             outline: none;
             border-color: #ffd700;
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.1);
         }
         
         .toggle-password {
@@ -66,13 +77,15 @@
             color: #888;
             cursor: pointer;
             padding: 5px;
+            font-size: 1rem;
+            transition: color 0.3s ease;
         }
         
         .toggle-password:hover {
             color: #ffd700;
         }
         
-        button { 
+        button[type="submit"] { 
             width: 100%; 
             padding: 12px; 
             margin: 20px 0 10px 0;
@@ -83,9 +96,10 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 1rem;
         }
         
-        button:hover {
+        button[type="submit"]:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
         }
@@ -97,37 +111,73 @@
             background: rgba(255, 107, 107, 0.1);
             border-radius: 6px;
             border: 1px solid #ff6b6b;
+            font-size: 0.9rem;
         }
         
         .login-info {
-            margin-top: 20px;
+            margin-top: 25px;
             color: #888;
             font-size: 0.9rem;
+            padding: 15px;
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        
+        .login-info p {
+            margin: 8px 0;
+        }
+        
+        .login-info strong {
+            color: #ffd700;
+        }
+
+        /* Placeholder styling */
+        ::placeholder {
+            color: #888;
+            opacity: 1;
+        }
+
+        :-ms-input-placeholder {
+            color: #888;
+        }
+
+        ::-ms-input-placeholder {
+            color: #888;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h2>Sistema CRM Terra Zen</h2>
+        <h2><i class="fas fa-lock"></i> Sistema CRM Terra Zen</h2>
         
         {% if error %}
-        <div class="error">Usuario o contraseña incorrectos</div>
+        <div class="error">
+            <i class="fas fa-exclamation-triangle"></i> Usuario o contraseña incorrectos
+        </div>
         {% endif %}
         
         <form method="post">
-            <input type="text" name="username" placeholder="Usuario" required>
+            <div class="input-group">
+                <input type="text" name="username" placeholder="Usuario" required 
+                       value="{{ request.form.username if request.form }}">
+                <!-- Sin icono de usuario - más limpio -->
+            </div>
             
             <div class="input-group">
                 <input type="password" name="password" id="password" placeholder="Contraseña" required>
                 <button type="button" class="toggle-password" onclick="togglePassword()">
-                    <i class="fas fa-eye"></i>
+                    <i class="fas fa-eye" id="eye-icon"></i>
                 </button>
             </div>
             
-            <button type="submit">Entrar al CRM</button>
+            <button type="submit">
+                <i class="fas fa-sign-in-alt"></i> Entrar al CRM
+            </button>
         </form>
         
         <div class="login-info">
+            <p><i class="fas fa-info-circle"></i> Credenciales de prueba:</p>
             <p>Usuario: <strong>admin</strong></p>
             <p>Contraseña: <strong>admin123</strong></p>
         </div>
@@ -136,16 +186,32 @@
     <script>
         function togglePassword() {
             const passwordInput = document.getElementById('password');
-            const toggleButton = document.querySelector('.toggle-password i');
+            const eyeIcon = document.getElementById('eye-icon');
             
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                toggleButton.className = 'fas fa-eye-slash';
+                eyeIcon.className = 'fas fa-eye-slash';
             } else {
                 passwordInput.type = 'password';
-                toggleButton.className = 'fas fa-eye';
+                eyeIcon.className = 'fas fa-eye';
             }
         }
+        
+        // Mejora: Permitir Enter para enviar el formulario
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        document.querySelector('button[type="submit"]').click();
+                    }
+                });
+            });
+            
+            // Auto-focus en el campo de usuario
+            document.querySelector('input[name="username"]').focus();
+        });
     </script>
 </body>
 </html>
