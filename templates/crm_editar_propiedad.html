@@ -284,11 +284,247 @@
                     <label for="imagenes">
                         <i class="fas fa-images"></i> URLs de Imágenes
                     </label>
-                    <textarea id="imagenes" name="imagenes" 
-                              placeholder="Ingresa las URLs de las imágenes separadas por comas">
-{% for img in propiedad.imagenes %}{{ img }}{% if not loop.last %},{% endif %}{% endfor %}</textarea>
-                    <div class="field-info">Separar URLs con comas. Ej: uploads/img1.jpg,uploads/img2.jpg</div>
-                    
+                     <!-- Área de subida de archivos -->
+    <div class="upload-area" id="uploadArea">
+        <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #666; margin-bottom: 10px;"></i>
+        <p>Haz clic aquí o arrastra imágenes para subirlas</p>
+        <p class="upload-info">Formatos: JPG, PNG, GIF, WEBP (Máx. 16MB por imagen)</p>
+        <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;">
+    </div>
+    
+    <!-- Vista previa de imágenes -->
+    <div class="image-previews" id="imagePreviews" style="display: none;">
+        <h4 style="color: #ffd700; margin: 15px 0 10px 0;">Imágenes subidas:</h4>
+        <div id="previewContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 10px;"></div>
+    </div>
+    
+    <!-- Campo oculto para almacenar las rutas -->
+    <textarea id="imagenes" name="imagenes" style="display: none;"></textarea>
+    
+    <div class="field-info">Las imágenes se guardarán automáticamente en el servidor</div>
+</div>
+
+<style>
+    .upload-area {
+        border: 2px dashed #444;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        background: #2a2a2a;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+    }
+    
+    .upload-area:hover {
+        border-color: #ffd700;
+        background: #2f2f2f;
+    }
+    
+    .upload-area.dragover {
+        border-color: #25d366;
+        background: #2a2a2a;
+    }
+    
+    .upload-info {
+        font-size: 0.8rem;
+        color: #888;
+        margin-top: 5px;
+    }
+    
+    .image-preview {
+        position: relative;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #444;
+    }
+    
+    .image-preview img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+    }
+    
+    .remove-image {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(255, 107, 107, 0.9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .upload-progress {
+        margin-top: 10px;
+        background: #333;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .progress-bar {
+        height: 4px;
+        background: linear-gradient(135deg, #ffd700, #ff6b00);
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+</style>
+
+<script>
+    // Sistema de subida de imágenes
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const imagePreviews = document.getElementById('imagePreviews');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagenesTextarea = document.getElementById('imagenes');
+        let uploadedPaths = [];
+        
+        // Abrir selector de archivos al hacer clic
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        // Manejar drag & drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        // Manejar selección de archivos
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+        
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            
+            const formData = new FormData();
+            for (let file of files) {
+                formData.append('images[]', file);
+            }
+            
+            // Mostrar progreso
+            showUploadProgress();
+            
+            // Subir archivos
+            fetch('/upload_images', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideUploadProgress();
+                
+                if (data.success) {
+                    // Agregar nuevas rutas
+                    uploadedPaths = [...uploadedPaths, ...data.paths];
+                    updateImageTextarea();
+                    updatePreviews();
+                    showNotification(data.message, 'success');
+                } else {
+                    showNotification('Error: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                hideUploadProgress();
+                showNotification('Error de conexión: ' + error.message, 'error');
+            });
+        }
+        
+        function updateImageTextarea() {
+            imagenesTextarea.value = uploadedPaths.join(',');
+        }
+        
+        function updatePreviews() {
+            if (uploadedPaths.length === 0) {
+                imagePreviews.style.display = 'none';
+                return;
+            }
+            
+            imagePreviews.style.display = 'block';
+            previewContainer.innerHTML = '';
+            
+            uploadedPaths.forEach((path, index) => {
+                const preview = document.createElement('div');
+                preview.className = 'image-preview';
+                preview.innerHTML = `
+                    <img src="/static/${path}" alt="Preview" onerror="this.src='/static/images/placeholder.jpg'">
+                    <button type="button" class="remove-image" onclick="removeImage(${index})">×</button>
+                `;
+                previewContainer.appendChild(preview);
+            });
+        }
+        
+        function showUploadProgress() {
+            uploadArea.innerHTML = `
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #ffd700; margin-bottom: 10px;"></i>
+                <p>Subiendo imágenes...</p>
+                <div class="upload-progress">
+                    <div class="progress-bar"></div>
+                </div>
+            `;
+        }
+        
+        function hideUploadProgress() {
+            uploadArea.innerHTML = `
+                <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #666; margin-bottom: 10px;"></i>
+                <p>Haz clic aquí o arrastra imágenes para subirlas</p>
+                <p class="upload-info">Formatos: JPG, PNG, GIF, WEBP (Máx. 16MB por imagen)</p>
+            `;
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 1000;
+                max-width: 300px;
+                ${type === 'success' ? 'background: linear-gradient(135deg, #25d366, #128c7e);' : 'background: linear-gradient(135deg, #ff6b6b, #ee5a52);'}
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+        
+        // Hacer removeImage accesible globalmente
+        window.removeImage = function(index) {
+            uploadedPaths.splice(index, 1);
+            updateImageTextarea();
+            updatePreviews();
+        };
+        
+        // Inicializar con cualquier valor existente
+        if (imagenesTextarea.value) {
+            uploadedPaths = imagenesTextarea.value.split(',').filter(path => path.trim() !== '');
+            updatePreviews();
+        }
+    });
+</script>
                     {% if propiedad.imagenes and propiedad.imagenes|length > 0 %}
                     <div class="image-previews">
                         {% for img in propiedad.imagenes %}
@@ -308,7 +544,7 @@
                     </a>
                 </div>
             </form>
-        </div>
+        
         
         <!-- Información adicional -->
         <div style="text-align: center; color: #888; font-size: 0.9rem;">
