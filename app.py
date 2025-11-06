@@ -1,11 +1,75 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import os
 import json
 from datetime import datetime
 import sqlite3
+import uuid
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = 'clave_secreta_terra_zen_2024'
+
+# ========== CONFIGURACIÓN DE UPLOADS==========
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Crear directorio de uploads si no existe
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+MAX_FILE_SIZE = 16 * 1024 * 1024  # 16MB
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_uploaded_images(files):
+    """Guarda imágenes subidas y retorna sus rutas"""
+    saved_paths = []
+    
+    for file in files:
+        if file and file.filename != '' and allowed_file(file.filename):
+            if file.content_length > MAX_FILE_SIZE:
+                continue  # Saltar archivos muy grandes
+                
+            # Generar nombre único para evitar colisiones
+            filename = secure_filename(file.filename)
+            unique_filename = f"{uuid.uuid4().hex}_{filename}"
+            
+            # Guardar archivo
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+            file.save(file_path)
+            
+            # Guardar ruta relativa para la base de datos
+            saved_paths.append(f"uploads/{unique_filename}")
+    
+    return saved_paths
+
+# Ruta para subir imágenes via AJAX (NUEVA RUTA)
+@app.route('/upload_images', methods=['POST'])
+def upload_images():
+    """Endpoint para subir imágenes"""
+    if not session.get('crm_logged_in'):
+        return jsonify({'success': False, 'error': 'No autorizado'}), 401
+    
+    try:
+        if 'images[]' not in request.files:
+            return jsonify({'success': False, 'error': 'No hay archivos'})
+        
+        files = request.files.getlist('images[]')
+        saved_paths = save_uploaded_images(files)
+        
+        if saved_paths:
+            return jsonify({
+                'success': True, 
+                'paths': saved_paths,
+                'message': f'{len(saved_paths)} imagen(es) subida(s) correctamente'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'No se pudieron subir las imágenes'})
+            
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # ========== CONFIGURACIÓN ==========
 UPLOAD_FOLDER = 'static/uploads'
@@ -600,7 +664,10 @@ def crm_propietarios():
             return "Error al guardar propietario", 500
     
     propietarios = get_all_propietarios()
-    return render_template('crm_propietarios.html', propietarios=propietarios)
+    propiedades = get_all_propiedades()  
+    return render_template('crm_propietarios.html', 
+                         propietarios=propietarios,
+                         propiedades=propiedades) 
 
 @app.route('/crm/propietarios/nuevo', methods=['GET', 'POST'])
 def crm_nuevo_propietario():
@@ -741,6 +808,7 @@ def crm_nueva_propiedad():
     propietarios = get_all_propietarios()
     return render_template('crm_nueva_propiedad.html', propietarios=propietarios)
 
+
 @app.route('/crm/propiedades/editar/<int:propiedad_id>', methods=['GET', 'POST'])
 def crm_editar_propiedad(propiedad_id):
     """Editar propiedad existente"""
@@ -796,34 +864,15 @@ def crm_logout():
     session.pop('crm_user', None)
     return redirect(url_for('home'))
 
-# ========== RUTAS ADMIN PROSPECTOS ==========
-@app.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    if session.get('admin_logged_in'):
-        return redirect(url_for('admin_prospectos'))
-    
-    if request.method == 'POST':
-        password = request.form['password']
-        if password == 'admin123':
-            session['admin_logged_in'] = True
-            return redirect(url_for('admin_prospectos'))
-        else:
-            return "Contraseña incorrecta"
-    
-    return render_template('admin_login.html')
-
-@app.route('/admin/prospectos')
+# ========== RUTAS DE PROSPECTOS (SIMPLIFICADO) ==========
+@app.route('/prospectos')
 def admin_prospectos():
-    if not session.get('admin_logged_in'):
-        return redirect(url_for('admin_login'))
+    """Vista de prospectos - solo para usuarios CRM logueados"""
+    if not session.get('crm_logged_in'):
+        return redirect(url_for('crm_login'))
     
     prospects = load_prospects()
     return render_template('admin_prospectos.html', prospects=prospects)
-
-@app.route('/admin/logout')
-def admin_logout():
-    session.pop('admin_logged_in', None)
-    return redirect(url_for('home'))
 
 # ========== INICIALIZACIÓN ==========
 init_db()
