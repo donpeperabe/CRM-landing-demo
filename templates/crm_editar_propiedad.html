@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Propiedad - CRM Terra Zen</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .crm-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #f4f4f4;
+        }
+        
+        .crm-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 16px;
+            border: 1px solid #444;
+        }
+        
+        .crm-header h1 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        
+        .form-container {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffd700;
+            font-weight: 600;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #f4f4f4;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd700, #ff6b00);
+            color: #000;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ff6b00, #ffd700);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #ffd700;
+            padding: 12px 25px;
+            border: 1px solid #ffd700;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-secondary:hover {
+            background: #ffd700;
+            color: #000;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .field-info {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .image-previews {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .image-preview {
+            width: 100px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #444;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="crm-container">
+        <!-- Header -->
+        <div class="crm-header">
+            <h1><i class="fas fa-home"></i> Editar Propiedad</h1>
+            <p>Actualiza la información de la propiedad</p>
+        </div>
+        
+        <!-- Formulario -->
+        <div class="form-container">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="propietario_id">
+                        <i class="fas fa-user-tie"></i> Propietario
+                    </label>
+                    <select id="propietario_id" name="propietario_id" required>
+                        <option value="">Seleccionar propietario</option>
+                        {% for prop in propietarios %}
+                        <option value="{{ prop.id }}" 
+                                {% if prop.id == propiedad.propietario_id %}selected{% endif %}>
+                            {{ prop.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="field-info">Selecciona el propietario de esta propiedad</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="titulo_es">
+                            <i class="fas fa-heading"></i> Título (Español)
+                        </label>
+                        <input type="text" id="titulo_es" name="titulo_es" 
+                               value="{{ propiedad.titulo_es }}" 
+                               placeholder="Ej: Terreno en Monterrico" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="titulo_en">
+                            <i class="fas fa-heading"></i> Title (English)
+                        </label>
+                        <input type="text" id="titulo_en" name="titulo_en" 
+                               value="{{ propiedad.titulo_en }}" 
+                               placeholder="Ej: Land in Monterrico" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="descripcion_es">
+                            <i class="fas fa-align-left"></i> Descripción (Español)
+                        </label>
+                        <textarea id="descripcion_es" name="descripcion_es" 
+                                  placeholder="Describe la propiedad en español">{{ propiedad.descripcion_es or '' }}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="descripcion_en">
+                            <i class="fas fa-align-left"></i> Description (English)
+                        </label>
+                        <textarea id="descripcion_en" name="descripcion_en" 
+                                  placeholder="Describe the property in English">{{ propiedad.descripcion_en or '' }}</textarea>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="precio">
+                            <i class="fas fa-tag"></i> Precio
+                        </label>
+                        <input type="text" id="precio" name="precio" 
+                               value="{{ propiedad.precio or '' }}" 
+                               placeholder="Ej: $26,700">
+                        <div class="field-info">Formato libre: $26,700, €25,000, etc.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ubicacion">
+                            <i class="fas fa-map-marker-alt"></i> Ubicación
+                        </label>
+                        <input type="text" id="ubicacion" name="ubicacion" 
+                               value="{{ propiedad.ubicacion or '' }}" 
+                               placeholder="Ej: Monterrico, Guatemala">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipo">
+                            <i class="fas fa-home"></i> Tipo de Propiedad
+                        </label>
+                        <select id="tipo" name="tipo">
+                            <option value="terreno" {% if propiedad.tipo == 'terreno' %}selected{% endif %}>Terreno</option>
+                            <option value="casa" {% if propiedad.tipo == 'casa' %}selected{% endif %}>Casa</option>
+                            <option value="apartamento" {% if propiedad.tipo == 'apartamento' %}selected{% endif %}>Apartamento</option>
+                            <option value="local" {% if propiedad.tipo == 'local' %}selected{% endif %}>Local Comercial</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="estado">
+                            <i class="fas fa-info-circle"></i> Estado
+                        </label>
+                        <select id="estado" name="estado">
+                            <option value="disponible" {% if propiedad.estado == 'disponible' %}selected{% endif %}>Disponible</option>
+                            <option value="reservado" {% if propiedad.estado == 'reservado' %}selected{% endif %}>Reservado</option>
+                            <option value="vendido" {% if propiedad.estado == 'vendido' %}selected{% endif %}>Vendido</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="whatsapp">
+                        <i class="fab fa-whatsapp"></i> WhatsApp de Contacto
+                    </label>
+                    <input type="text" id="whatsapp" name="whatsapp" 
+                           value="{{ propiedad.whatsapp or '' }}" 
+                           placeholder="Ej: 50244851125">
+                    <div class="field-info">Solo números, sin símbolos. Ej: 50244851125</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="imagenes">
+                        <i class="fas fa-images"></i> URLs de Imágenes
+                    </label>
+                    <textarea id="imagenes" name="imagenes" 
+                              placeholder="Ingresa las URLs de las imágenes separadas por comas">
+{% for img in propiedad.imagenes %}{{ img }}{% if not loop.last %},{% endif %}{% endfor %}</textarea>
+                    <div class="field-info">Separar URLs con comas. Ej: uploads/img1.jpg,uploads/img2.jpg</div>
+                    
+                    {% if propiedad.imagenes and propiedad.imagenes|length > 0 %}
+                    <div class="image-previews">
+                        {% for img in propiedad.imagenes %}
+                        <img src="{{ url_for('static', filename=img) }}" alt="Preview" class="image-preview" 
+                             onerror="this.style.display='none'">
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                    <a href="/crm/propiedades" class="btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Información adicional -->
+        <div style="text-align: center; color: #888; font-size: 0.9rem;">
+            <p><i class="fas fa-info-circle"></i> Los cambios se aplicarán inmediatamente en el sitio público</p>
+        </div>
+    </div>
+</body>
+</html>
