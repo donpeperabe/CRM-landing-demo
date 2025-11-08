@@ -6,6 +6,63 @@
     <title>{{ propiedad.titulo_es }} - Terra Zen Inmobiliaria</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ESTILOS OPTIMIZADOS PARA GALERÍA */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+            padding: 0 15px;
+        }
+        
+        .gallery img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #333;
+            cursor: pointer;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+        }
+        
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+                padding: 0 10px;
+            }
+            
+            .gallery img {
+                height: 180px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="card">
@@ -23,20 +80,27 @@
             <button id="btn-ingles" class="lang-btn">English</button>
         </div>
 
-        <!-- GALERÍA DINÁMICA CORREGIDA -->
+        <!-- GALERÍA SIMPLIFICADA -->
         <div class="gallery">
             {% if propiedad.imagenes and propiedad.imagenes|length > 0 %}
                 {% for img in propiedad.imagenes %}
                     <img src="{{ url_for('static', filename=img) }}" 
                          alt="{{ propiedad.titulo_es }}" 
-                         onerror="this.src='/static/images/placeholder.jpg'">
+                         onclick="openModal(this)"
+                         loading="lazy">
                 {% endfor %}
             {% else %}
-                <div style="text-align: center; padding: 40px; color: #666; width: 100%;">
-                    <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                    <p>No hay imágenes disponibles para esta propiedad</p>
+                <div style="grid-column:1/-1;text-align:center;padding:40px;color:#666">
+                    <i class="fas fa-image" style="font-size:3rem;margin-bottom:15px"></i>
+                    <p>No hay imágenes disponibles</p>
                 </div>
             {% endif %}
+        </div>
+
+        <!-- MODAL SIMPLIFICADO -->
+        <div id="imageModal" class="modal">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <img class="modal-content" id="modalImage">
         </div>
 
         <div class="info">
@@ -44,16 +108,12 @@
             <div id="content-espanol" class="language-content">
                 <h2>{{ propiedad.titulo_es }}</h2>
                 
-                <!-- Información adicional de la propiedad -->
                 <div class="property-meta">
                     {% if propiedad.ubicacion %}
                     <span><i class="fas fa-map-marker-alt"></i> {{ propiedad.ubicacion }}</span>
                     {% endif %}
                     {% if propiedad.tipo %}
                     <span><i class="fas fa-home"></i> {{ propiedad.tipo|title }}</span>
-                    {% endif %}
-                    {% if propiedad.estado %}
-                    <span><i class="fas fa-info-circle"></i> {{ propiedad.estado|title }}</span>
                     {% endif %}
                 </div>
                 
@@ -61,7 +121,7 @@
                     {% if propiedad.descripcion_es %}
                         {{ propiedad.descripcion_es }}
                     {% else %}
-                        Propiedad de calidad en excelente ubicación. Contáctanos para más información.
+                        Propiedad de calidad en excelente ubicación.
                     {% endif %}
                 </p>
                 
@@ -69,55 +129,26 @@
                 <p class="price">{{ propiedad.precio }}</p>
                 {% endif %}
                 
-                <!-- Botones de acción -->
-                <div style="display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 25px;">
+                <!-- BOTONES CORREGIDOS -->
+                <div style="display:flex;flex-direction:column;gap:15px;align-items:center;margin-top:25px">
                     {% if propiedad.whatsapp %}
-                    <a href="https://wa.me/{{ propiedad.whatsapp }}?text=Hola%20estoy%20interesado%20en%20la%20propiedad: {{ propiedad.titulo_es | urlencode }}" 
-                       target="_blank" class="btn-whatsapp"
-                       onclick="trackContact('whatsapp')">
+                    <a href="https://wa.me/{{ propiedad.whatsapp }}?text=Hola, estoy interesado en la propiedad: {{ propiedad.titulo_es }}" 
+                       target="_blank" class="btn-whatsapp">
                         <i class="fab fa-whatsapp"></i> Contactar por WhatsApp
                     </a>
                     {% endif %}
                     
                     <a href="{{ url_for('prospect_form') }}?source=landing&propiedad_id={{ propiedad.id }}" 
-                       class="btn-prospecto"
-                       onclick="trackContact('form')">
-                        <i class="fas fa-envelope"></i> Dejar información de contacto
+                       class="btn-prospecto">
+                        <i class="fas fa-envelope"></i> Dejar información
                     </a>
-                </div>
-                
-                <!-- BOTONES DE REDES SOCIALES - ESPAÑOL -->
-                <div class="social-media">
-                    <p>¿Conoces a alguien que le interese? Comparte:</p>
-                    <div class="social-buttons">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url | urlencode }}" 
-                           target="_blank" class="social-btn fb"
-                           onclick="trackSocial('facebook')">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url | urlencode }}" 
-                           target="_blank" class="social-btn in"
-                           onclick="trackSocial('linkedin')">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
-                        <a href="#" class="social-btn tt"
-                           onclick="shareTwitter('{{ propiedad.titulo_es }}', '{{ request.url }}')">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="https://api.whatsapp.com/send?text=Mira%20esta%20propiedad:%20{{ propiedad.titulo_es | urlencode }}%20{{ request.url | urlencode }}" 
-                           target="_blank" class="social-btn wa"
-                           onclick="trackSocial('whatsapp_share')">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
                 </div>
             </div>
 
             <!-- CONTENIDO EN INGLÉS -->
-            <div id="content-ingles" class="language-content" style="display: none;">
+            <div id="content-ingles" class="language-content" style="display:none">
                 <h2>{{ propiedad.titulo_en }}</h2>
                 
-                <!-- Información adicional de la propiedad -->
                 <div class="property-meta">
                     {% if propiedad.ubicacion %}
                     <span><i class="fas fa-map-marker-alt"></i> {{ propiedad.ubicacion }}</span>
@@ -125,16 +156,13 @@
                     {% if propiedad.tipo %}
                     <span><i class="fas fa-home"></i> {{ propiedad.tipo|title }}</span>
                     {% endif %}
-                    {% if propiedad.estado %}
-                    <span><i class="fas fa-info-circle"></i> {{ propiedad.estado|title }}</span>
-                    {% endif %}
                 </div>
                 
                 <p class="desc">
                     {% if propiedad.descripcion_en %}
                         {{ propiedad.descripcion_en }}
                     {% else %}
-                        Quality property in excellent location. Contact us for more information.
+                        Quality property in excellent location.
                     {% endif %}
                 </p>
                 
@@ -142,156 +170,70 @@
                 <p class="price">{{ propiedad.precio }}</p>
                 {% endif %}
                 
-                <!-- Botones de acción -->
-                <div style="display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 25px;">
+                <!-- BOTONES CORREGIDOS -->
+                <div style="display:flex;flex-direction:column;gap:15px;align-items:center;margin-top:25px">
                     {% if propiedad.whatsapp %}
-                    <a href="https://wa.me/{{ propiedad.whatsapp }}?text=Hello%20I'm%20interested%20in%20the%20property: {{ propiedad.titulo_en | urlencode }}" 
-                       target="_blank" class="btn-whatsapp"
-                       onclick="trackContact('whatsapp')">
+                    <a href="https://wa.me/{{ propiedad.whatsapp }}?text=Hello, I'm interested in the property: {{ propiedad.titulo_en }}" 
+                       target="_blank" class="btn-whatsapp">
                         <i class="fab fa-whatsapp"></i> Contact via WhatsApp
                     </a>
                     {% endif %}
                     
                     <a href="{{ url_for('prospect_form') }}?source=landing&propiedad_id={{ propiedad.id }}" 
-                       class="btn-prospecto"
-                       onclick="trackContact('form')">
+                       class="btn-prospecto">
                         <i class="fas fa-envelope"></i> Leave contact information
                     </a>
-                </div>
-                
-                <!-- BOTONES DE REDES SOCIALES - INGLÉS -->
-                <div class="social-media">
-                    <p>Know someone who might be interested? Share:</p>
-                    <div class="social-buttons">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url | urlencode }}" 
-                           target="_blank" class="social-btn fb"
-                           onclick="trackSocial('facebook')">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url | urlencode }}" 
-                           target="_blank" class="social-btn in"
-                           onclick="trackSocial('linkedin')">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
-                        <a href="#" class="social-btn tt"
-                           onclick="shareTwitter('{{ propiedad.titulo_en }}', '{{ request.url }}')">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="https://api.whatsapp.com/send?text=Check%20out%20this%20property:%20{{ propiedad.titulo_en | urlencode }}%20{{ request.url | urlencode }}" 
-                           target="_blank" class="social-btn wa"
-                           onclick="trackSocial('whatsapp_share')">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Función para cambiar idioma via AJAX
+        // CÓDIGO OPTIMIZADO - SIN ERRORES
         function setLanguage(lang) {
-            fetch('/set_language/' + lang)
-                .then(response => {
-                    showLanguage(lang);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showLanguage(lang);
-                });
+            showLanguage(lang);
+            fetch('/set_language/' + lang).catch(() => {});
         }
 
-        // JavaScript para cambiar idiomas
-        document.getElementById('btn-espanol').addEventListener('click', function() {
-            setLanguage('espanol');
-        });
-
-        document.getElementById('btn-ingles').addEventListener('click', function() {
-            setLanguage('ingles');
-        });
-
         function showLanguage(lang) {
-            // Ocultar todos los contenidos
-            document.querySelectorAll('.language-content').forEach(function(content) {
+            document.querySelectorAll('.language-content').forEach(content => {
                 content.style.display = 'none';
             });
-            
-            // Mostrar el contenido seleccionado
             document.getElementById('content-' + lang).style.display = 'block';
             
-            // Actualizar botones activos
-            document.querySelectorAll('.lang-btn').forEach(function(btn) {
+            document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             document.getElementById('btn-' + lang).classList.add('active');
         }
 
-        // Funciones de tracking SIMPLIFICADAS
-        function trackContact(method) {
-            console.log('Contact method:', method);
-            // Aquí podrías enviar a Google Analytics
+        // MODAL SIMPLIFICADO
+        function openModal(img) {
+            document.getElementById('modalImage').src = img.src;
+            document.getElementById('imageModal').style.display = 'block';
         }
 
-        function trackSocial(network) {
-            console.log('Shared on:', network);
-            // Aquí podrías enviar a Google Analytics
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
         }
 
-        function shareTwitter(title, url) {
-            const text = `Mira esta propiedad: ${title}`;
-            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-            window.open(twitterUrl, '_blank');
-            trackSocial('twitter');
-        }
-
-        // Inicializar con el idioma de la sesión
+        // EVENT LISTENERS EFICIENTES
         document.addEventListener('DOMContentLoaded', function() {
             showLanguage('espanol');
+            
+            document.getElementById('btn-espanol').onclick = () => setLanguage('espanol');
+            document.getElementById('btn-ingles').onclick = () => setLanguage('ingles');
+            
+            // Cerrar modal con ESC
+            document.onkeydown = function(e) {
+                if (e.key === 'Escape') closeModal();
+            };
+            
+            // Cerrar modal click fuera
+            document.getElementById('imageModal').onclick = function(e) {
+                if (e.target === this) closeModal();
+            };
         });
     </script>
-
-    <style>
-        /* Estilos adicionales para el template dinámico */
-        .social-btn.wa {
-            background: #25d366;
-        }
-        
-        .social-btn.tt {
-            background: #1da1f2;
-        }
-        
-        .property-meta {
-            color: #ccc;
-            font-size: 0.95rem;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .property-meta span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 10px;
-            background: #2a2a2a;
-            border-radius: 8px;
-            border: 1px solid #444;
-        }
-        
-        @media (max-width: 768px) {
-            .property-meta {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .property-meta span {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
 </body>
 </html>
