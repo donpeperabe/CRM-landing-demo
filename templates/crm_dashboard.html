@@ -239,6 +239,7 @@
         <p>Agrega y administra los propietarios de las propiedades</p>
     </div>
     
+    {% if propietarios %}
     <div class="action-card" onclick="location.href='/crm/propiedades'">
         <div class="action-icon">
             <i class="fas fa-home"></i>
@@ -246,8 +247,19 @@
         <h3>Gestionar Propiedades</h3>
         <p>Administra todas las propiedades disponibles</p>
     </div>
+{% else %}
+    <div class="action-card" style="opacity:0.5; cursor:not-allowed;" 
+         onclick="alert('⚠️ Primero debes agregar un propietario antes de gestionar propiedades.');">
+        <div class="action-icon">
+            <i class="fas fa-home"></i>
+        </div>
+        <h3>Gestionar Propiedades</h3>
+        <p>Agrega un propietario para habilitar esta función</p>
+    </div>
+{% endif %}
+
     
-    <!-- NUEVA CARD PARA PROSPECTOS -->
+    <!--PROSPECTOS -->
     <div class="action-card" onclick="location.href='/prospectos'">
         <div class="action-icon">
             <i class="fas fa-chart-line"></i>
