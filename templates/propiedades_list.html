@@ -6,7 +6,7 @@
     <title>Propiedades - Terra Zen</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+    </head>
 <body>
     <div class="card">
         <div class="card-header">
@@ -64,13 +64,28 @@
                 </div>
                 {% endfor %}
             </div>
+            <!--Redes sociales -->
+    <div class="social-buttons">
+              <a href="https://www.facebook.com/share/1Cy6eVsvyr/" target="_blank" class="social-btn fb">
+              <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/terra-zen-48b716346?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="social-btn in">
+                <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="https://www.tiktok.com/@terrazeninmobiliaria?_t=ZM-90vy3cCRQNf&_r=1" target="_blank" class="social-btn tt">
+                <i class="fab fa-tiktok"></i>
+                </a>
+                <a href="https://www.instagram.com/terra_zen_inmobiliaria?igsh=aW1vdDQ3dDNiaWZz" target="_blank" class="social-btn ig">
+                <i class="fab fa-instagram"></i>
+                </a>
+        </div>
             
             <div style="text-align: center; margin-top: 30px;">
                 <a href="/" class="btn-primary">
                     <i class="fas fa-arrow-left"></i> Volver al Inicio
                 </a>
             </div>
-        </div>
+                    </div>
     </div>
 
     <script>
@@ -87,7 +102,6 @@
             });
         });
     </script>
-
     <style>
         .properties-grid {
             display: grid;
@@ -211,6 +225,6 @@
             background: linear-gradient(135deg, #1e3d6f, #2c5aa0);
             box-shadow: 0 0 15px rgba(44, 90, 160, 0.4);
         }
-    </style>
+ </style>
 </body>
 </html>
