@@ -5,6 +5,12 @@ from datetime import datetime
 import sqlite3
 import uuid
 from werkzeug.utils import secure_filename
+from flask import session, jsonify
+
+def get_db_connection():
+    conn = sqlite3.connect('terrazen.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = 'clave_secreta_terra_zen_2024'
@@ -428,17 +434,19 @@ def update_propiedad(propiedad_id, datos):
         return False
 
 def delete_propietario(propietario_id):
-    """Elimina (desactiva) un propietario"""
     try:
-        conn = sqlite3.connect(get_db_path())
-        cursor = conn.cursor()
-        cursor.execute('UPDATE propietarios SET activo = 0 WHERE id = ?', (propietario_id,))
+        conn = get_db_connection()
+        # Borra propiedades primero
+        conn.execute("DELETE FROM propiedades WHERE propietario_id = ?", (propietario_id,))
+        # Luego el propietario
+        conn.execute("DELETE FROM propietarios WHERE id = ?", (propietario_id,))
         conn.commit()
         conn.close()
         return True
     except Exception as e:
-        print(f"Error eliminando propietario: {e}")
+        print("Error en delete_propietario:", e)
         return False
+
 
 def delete_propiedad(propiedad_id):
     """Elimina (desactiva) una propiedad"""
@@ -546,18 +554,24 @@ def propiedad_detalle(propiedad_id):
     if not propiedad:
         return "Propiedad no encontrada", 404
     
-    # Detectar idioma del navegador
+# Detectar idioma del navegador
     if 'language' not in session:
         browser_lang = request.accept_languages.best_match(['es', 'en'])
         session['language'] = 'espanol' if browser_lang == 'es' else 'ingles'
     
     return render_template('propiedad_landing.html', propiedad=propiedad)
 
+# --- CONFIGURACIÓN DE IDIOMA GLOBAL ---
 @app.route('/set_language/<language>')
 def set_language(language):
     if language in ['espanol', 'ingles']:
         session['language'] = language
-    return redirect(request.referrer or url_for('propiedades_list'))
+    return jsonify(success=True)
+
+@app.context_processor
+def inject_language():
+    # Hace que 'language' esté disponible en todos los templates
+    return {'language': session.get('language', 'espanol')}
 
 @app.route('/prospecto', methods=['GET', 'POST'])
 def prospect_form():
@@ -669,6 +683,16 @@ def crm_propietarios():
                          propietarios=propietarios,
                          propiedades=propiedades) 
 
+      # 🔹 Aquí añadimos la variable del idioma desde la sesión:
+    language = session.get('language', 'espanol')
+    
+    return render_template(
+        'crm_propietarios.html', 
+        propietarios=propietarios,
+        propiedades=propiedades,
+        language=language   # 🔹 la pasamos al template
+    )
+
 @app.route('/crm/propietarios/nuevo', methods=['GET', 'POST'])
 def crm_nuevo_propietario():
     """Formulario para agregar nuevo propietario"""
@@ -726,7 +750,7 @@ def crm_eliminar_propietario(propietario_id):
         return redirect(url_for('crm_propietarios'))
     else:
         return "Error al eliminar propietario", 500
-
+        
 @app.route('/crm/propietarios/<int:propietario_id>')
 def crm_detalle_propietario(propietario_id):
     """Ver detalle de propietario y sus propiedades"""
@@ -750,7 +774,9 @@ def crm_propiedades():
     """Gestión de propiedades en el CRM"""
     if not session.get('crm_logged_in'):
         return redirect(url_for('crm_login'))
-    
+
+    language = session.get('language', 'espanol')
+
     if request.method == 'POST':
         propiedad = {
             'propietario_id': request.form['propietario_id'],
@@ -765,18 +791,22 @@ def crm_propiedades():
             'whatsapp': request.form.get('whatsapp', ''),
             'imagenes': request.form.get('imagenes', '').split(',')
         }
-        
+
         propiedad_id = save_propiedad(propiedad)
         if propiedad_id:
             return redirect(url_for('crm_propiedades'))
         else:
             return "Error al guardar propiedad", 500
-    
+
     propietarios = get_all_propietarios()
     propiedades = get_all_propiedades()
-    return render_template('crm_propiedades.html', 
-                         propietarios=propietarios, 
-                         propiedades=propiedades)
+
+    return render_template(
+        'crm_propiedades.html',
+        propietarios=propietarios,
+        propiedades=propiedades,
+        language=language
+    )
 
 @app.route('/crm/propiedades/nueva', methods=['GET', 'POST'])
 def crm_nueva_propiedad():
