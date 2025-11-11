@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM - Terra Zen</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+            color: #f4f4f4;
+            min-height: 100vh;
+        }
+        
+         .crm-logo {
+            margin-bottom: 30px;
+        }
+
+        .crm-logo img {
+            max-width: 120px;
+            height: auto;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo img:hover {
+            transform: scale(1.05);
+        }
+
+        .logo a {
+            text-decoration: none;
+            display: inline-block;
+        }
+    .language-switcher {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 25px 0;
+    padding: 20px;
+    width: 100%;
+    background: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.lang-btn {
+    background: #e9ecef;
+    color: #6c757d;
+    font-weight: 600;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.lang-btn.active {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: white;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+
+.lang-btn:hover:not(.active) {
+    background: #dee2e6;
+    transform: translateY(-2px);
+}
+
+/* ===== CONTENIDO DE IDIOMAS ===== */
+.language-content {
+    transition: opacity 0.3s ease;
+}
+        /* SOLO HOVER PARA EL LOGO - Suave y elegante */
+ .crm-logo a:hover img {
+    transform: scale(1.05);
+    filter: brightness(1.1) contrast(1.1) drop-shadow(0 0 8px rgba(102, 126, 234, 0.5));
+}
+    .crm-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .crm-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 16px;
+            border: 1px solid #444;
+        }
+        
+        .crm-header h1 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        
+        .user-welcome {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+        
+        .crm-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .action-card {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+            border-color: #ffd700;
+        }
+        
+        .action-icon {
+            font-size: 3rem;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+        
+        .action-card h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        
+        .action-card p {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+        
+        .propietarios-section {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        .section-title {
+            color: #ffd700;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd700, #ff6b00);
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #ff6b00, #ffd700);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #ffd700;
+            padding: 10px 20px;
+            border: 1px solid #ffd700;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background: #ffd700;
+            color: #000;
+        }
+        
+        .propietarios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .propietario-card {
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .propietario-card:hover {
+            border-color: #ffd700;
+            transform: translateY(-3px);
+        }
+        
+        .propietario-name {
+            color: #ffd700;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .propietario-info {
+            color: #ccc;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #ccc;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="crm-container">
+        <!-- ====== BOTONES DE IDIOMA ====== -->
+        <div class="language-switcher" style="text-align:center; margin-bottom:20px;">
+            <button id="btn-espanol" class="lang-btn active">Español</button>
+            <button id="btn-ingles" class="lang-btn">English</button>
+        </div>
+
+        <!-- ====== CONTENIDO EN ESPAÑOL ====== -->
+        <div id="content-espanol" class="language-content">
+            <div class="crm-header">
+                <div class="crm-logo">
+                    <a href="{{ url_for('propiedades_list') }}" title="Ir al listado de propiedades">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Terra Zen" class="crm-logo-img">
+                    </a>
+                </div>
+                <h1><i class="fas fa-building"></i> Sistema CRM Terra Zen</h1>
+                <p class="user-welcome">Bienvenido, <strong>{{ user.nombre }}</strong></p>
+                <p>Gestiona propiedades y propietarios desde un solo lugar</p>
+            </div>
+
+            <!-- Acciones principales -->
+            <div class="crm-actions">
+                <div class="action-card" onclick="location.href='/crm/propietarios'">
+                    <div class="action-icon"><i class="fas fa-users"></i></div>
+                    <h3>Gestionar Propietarios</h3>
+                    <p>Agrega y administra los propietarios de las propiedades</p>
+                </div>
+
+                {% if propietarios %}
+                <div class="action-card" onclick="location.href='/crm/propiedades'">
+                    <div class="action-icon"><i class="fas fa-home"></i></div>
+                    <h3>Gestionar Propiedades</h3>
+                    <p>Administra todas las propiedades disponibles</p>
+                </div>
+                {% else %}
+                <div class="action-card" style="opacity:0.5; cursor:not-allowed;"
+                    onclick="alert('⚠️ Primero debes agregar un propietario antes de gestionar propiedades.');">
+                    <div class="action-icon"><i class="fas fa-home"></i></div>
+                    <h3>Gestionar Propiedades</h3>
+                    <p>Agrega un propietario para habilitar esta función</p>
+                </div>
+                {% endif %}
+
+                <div class="action-card" onclick="location.href='/prospectos'">
+                    <div class="action-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Ver Prospectos</h3>
+                    <p>Revisa los leads y contactos capturados</p>
+                </div>
+            </div>
+
+            <!-- Propietarios recientes -->
+            <div class="propietarios-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-users"></i> Propietarios Registrados</h2>
+                    <a href="/crm/propietarios" class="btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Propietario
+                    </a>
+                </div>
+
+                {% if propietarios %}
+                <div class="propietarios-grid">
+                    {% for propietario in propietarios %}
+                    <div class="propietario-card">
+                        <div class="propietario-name">{{ propietario.nombre }}</div>
+                        {% if propietario.email %}
+                        <div class="propietario-info"><i class="fas fa-envelope"></i> {{ propietario.email }}</div>
+                        {% endif %}
+                        {% if propietario.telefono %}
+                        <div class="propietario-info"><i class="fas fa-phone"></i> {{ propietario.telefono }}</div>
+                        {% endif %}
+                        <div class="propietario-info"><i class="fas fa-calendar"></i> {{ propietario.fecha_registro[:10] }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <h3>No hay propietarios registrados</h3>
+                    <p>Comienza agregando tu primer propietario</p>
+                    <a href="/crm/propietarios" class="btn-primary" style="margin-top: 15px;">
+                        <i class="fas fa-plus"></i> Agregar Primer Propietario
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Acciones administrativas -->
+            <div class="admin-actions">
+                <a href="/propiedades" class="btn-secondary">
+                    <i class="fas fa-globe"></i> Ver Sitio Público
+                </a>
+                <a href="/crm/logout" class="btn-secondary">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+
+        <!-- ====== ENGLISH VERSION ====== -->
+        <div id="content-ingles" class="language-content" style="display:none;">
+            <div class="crm-header">
+                <div class="crm-logo">
+                    <a href="{{ url_for('propiedades_list') }}" title="Go to property listings">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Terra Zen" class="crm-logo-img">
+                    </a>
+                </div>
+                <h1><i class="fas fa-building"></i> Terra Zen CRM System</h1>
+                <p class="user-welcome">Welcome, <strong>{{ user.nombre }}</strong></p>
+                <p>Manage properties and owners from one place</p>
+            </div>
+
+            <!-- Main actions -->
+            <div class="crm-actions">
+                <div class="action-card" onclick="location.href='/crm/propietarios'">
+                    <div class="action-icon"><i class="fas fa-users"></i></div>
+                    <h3>Manage Owners</h3>
+                    <p>Add and manage property owners</p>
+                </div>
+
+                {% if propietarios %}
+                <div class="action-card" onclick="location.href='/crm/propiedades'">
+                    <div class="action-icon"><i class="fas fa-home"></i></div>
+                    <h3>Manage Properties</h3>
+                    <p>Administer all available properties</p>
+                </div>
+                {% else %}
+                <div class="action-card" style="opacity:0.5; cursor:not-allowed;"
+                    onclick="alert('⚠️ You must add an owner before managing properties.');">
+                    <div class="action-icon"><i class="fas fa-home"></i></div>
+                    <h3>Manage Properties</h3>
+                    <p>Add an owner to enable this function</p>
+                </div>
+                {% endif %}
+
+                <div class="action-card" onclick="location.href='/prospectos'">
+                    <div class="action-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>View Leads</h3>
+                    <p>Review captured leads and contacts</p>
+                </div>
+            </div>
+
+            <!-- Recent owners -->
+            <div class="propietarios-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-users"></i> Registered Owners</h2>
+                    <a href="/crm/propietarios" class="btn-primary">
+                        <i class="fas fa-plus"></i> New Owner
+                    </a>
+                </div>
+
+                {% if propietarios %}
+                <div class="propietarios-grid">
+                    {% for propietario in propietarios %}
+                    <div class="propietario-card">
+                        <div class="propietario-name">{{ propietario.nombre }}</div>
+                        {% if propietario.email %}
+                        <div class="propietario-info"><i class="fas fa-envelope"></i> {{ propietario.email }}</div>
+                        {% endif %}
+                        {% if propietario.telefono %}
+                        <div class="propietario-info"><i class="fas fa-phone"></i> {{ propietario.telefono }}</div>
+                        {% endif %}
+                        <div class="propietario-info"><i class="fas fa-calendar"></i> {{ propietario.fecha_registro[:10] }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <h3>No owners registered</h3>
+                    <p>Start by adding your first owner</p>
+                    <a href="/crm/propietarios" class="btn-primary" style="margin-top: 15px;">
+                        <i class="fas fa-plus"></i> Add First Owner
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Admin actions -->
+            <div class="admin-actions">
+                <a href="/propiedades" class="btn-secondary">
+                    <i class="fas fa-globe"></i> View Public Site
+                </a>
+                <a href="/crm/logout" class="btn-secondary">
+                    <i class="fas fa-sign-out-alt"></i> Log Out
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // IDIOMA
+        function setLanguage(lang) {
+            showLanguage(lang);
+            fetch('/set_language/' + lang).catch(() => {});
+        }
+
+        function showLanguage(lang) {
+            document.querySelectorAll('.language-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById('content-' + lang).style.display = 'block';
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('btn-' + lang).classList.add('active');
+        }
+
+        // MODAL SIMPLIFICADO
+        function openModal(img) {
+            document.getElementById('modalImage').src = img.src;
+            document.getElementById('imageModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // EVENT LISTENERS EFICIENTES
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentLang = "{{ language }}";
+            showLanguage(currentLang);
+            
+            document.getElementById('btn-espanol').onclick = () => setLanguage('espanol');
+            document.getElementById('btn-ingles').onclick = () => setLanguage('ingles');
+            
+            // Cerrar modal con ESC
+            document.onkeydown = function(e) {
+                if (e.key === 'Escape') closeModal();
+            };
+            
+            // Cerrar modal click fuera
+            document.getElementById('imageModal').onclick = function(e) {
+                if (e.target === this) closeModal();
+            };
+        });
+    </script>
+</body>
+</html>
