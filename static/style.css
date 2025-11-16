@@ -1,5 +1,3 @@
-/* ======= NUEVA VERSIÓN CSS (versión B) ======= */
-
 /* Fondo general */
 body {
     margin: 0;
@@ -830,4 +828,5 @@ body {
 .property-status.default .status-dot {
     background-color: #6c757d; /* gris */
 }
+
 
