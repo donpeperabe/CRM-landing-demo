@@ -542,9 +542,77 @@ def home():
 
 @app.route('/propiedades')
 def propiedades_list():
-    """Página principal con listado de todas las propiedades"""
+    """Página con listado de propiedades + filtros aplicados"""
+
+    lang = request.args.get('lang')
+    if lang and lang in ['espanol', 'ingles']:
+        session['language'] = lang
+    else:
+        lang = session.get('language', 'espanol')
+    
+    print(f"IDIOMA ACTUAL: {lang}")  # Para debug
+
+    filtro_tipo = request.args.get('tipo', '').strip().lower()
+    filtro_ubicacion = request.args.get('ubicacion', '').strip().lower()
+    filtro_precio = request.args.get('precio', '').strip()
+
     propiedades = get_all_propiedades()
-    return render_template('propiedades_list.html', propiedades=propiedades)
+
+    def parse_price(raw_price):
+        if not raw_price:
+            return 0
+        clean = (
+            str(raw_price)
+            .replace("$", "")
+            .replace("Q", "")
+            .replace("€", "")
+            .replace(",", "")
+            .replace(" ", "")
+            .strip()
+        )
+        try:
+            return int(float(clean))
+        except:
+            return 0
+
+    propiedades_filtradas = []
+
+    for p in propiedades:
+
+        tipo = (p.get('tipo') or '').lower()
+        ubicacion = (p.get('ubicacion') or '').lower()
+        precio = parse_price(p.get('precio'))
+
+        if filtro_tipo and filtro_tipo != tipo:
+            continue
+
+        if filtro_ubicacion and filtro_ubicacion not in ubicacion:
+            continue
+
+        if filtro_precio:
+            try:
+                min_p, max_p = filtro_precio.split('-')
+                min_p = int(min_p)
+                max_p = int(max_p)
+
+                if max_p == 1000000:
+                    if precio < min_p:
+                        continue
+                else:
+                    if not (min_p <= precio <= max_p):
+                        continue
+            except:
+                pass
+
+        propiedades_filtradas.append(p)
+
+    return render_template(
+        'propiedades_list.html',
+        propiedades=propiedades_filtradas,
+        filtro_tipo=filtro_tipo,
+        filtro_ubicacion=filtro_ubicacion,
+        filtro_precio=filtro_precio
+    )
 
 # SOLO UNA DEFINICIÓN DE propiedad_detalle
 @app.route('/propiedad/<int:propiedad_id>')
