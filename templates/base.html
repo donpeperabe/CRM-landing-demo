@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="{{ request.args.get('lang', 'espanol') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Terra Zen{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
+    <script src="{{ url_for('static', filename='js/language-manager.js') }}"></script>
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <!-- HEADER GLOBAL -->
+    {% include "partials/header.html" %}
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main>
+        <div class="main-container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- FOOTER GLOBAL -->
+    {% include "partials/footer.html" %}
+
+    <!-- SCRIPT CENTRALIZADO PARA GESTIÓN DE IDIOMA -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Inicializar el idioma en TODOS los templates
+        const initialLang = window.languageManager.getCurrentLanguage();
+        
+        // Función global para mostrar contenido según idioma
+        window.showLanguageContent = function(lang) {
+            document.querySelectorAll('.language-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            const contentElement = document.getElementById('content-' + lang);
+            if (contentElement) {
+                contentElement.style.display = 'block';
+            }
+            
+            // Actualizar botones de idioma si existen
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const btnElement = document.getElementById('btn-' + lang);
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
+        };
+
+        // Mostrar idioma inicial
+        window.showLanguageContent(initialLang);
+
+        // Escuchar cambios de idioma globalmente
+        window.addEventListener('languageChanged', function(event) {
+            window.showLanguageContent(event.detail.language);
+            
+            // Actualizar todos los enlaces con el nuevo idioma
+            const links = document.querySelectorAll('a[href]');
+            links.forEach(link => {
+                let href = link.getAttribute('href');
+                if (!href) return;
+
+                // Ignorar si ya tiene lang
+                if (href.includes("lang=")) {
+                    href = href.replace(/([&?])lang=[^&]*/, '$1lang=' + event.detail.language);
+                } else if (
+                    !href.startsWith("http") &&
+                    !href.startsWith("mailto:") &&
+                    !href.startsWith("tel:") &&
+                    !href.startsWith("#") &&
+                    href.includes("?")
+                ) {
+                    href += "&lang=" + event.detail.language;
+                } else if (
+                    !href.startsWith("http") &&
+                    !href.startsWith("mailto:") &&
+                    !href.startsWith("tel:") &&
+                    !href.startsWith("#") &&
+                    !href.includes("?")
+                ) {
+                    href += "?lang=" + event.detail.language;
+                }
+                
+                link.setAttribute("href", href);
+            });
+        });
+
+        // Configurar botones de idioma si existen
+        const btnEspanol = document.getElementById('btn-espanol');
+        const btnIngles = document.getElementById('btn-ingles');
+        
+        if (btnEspanol) {
+            btnEspanol.onclick = () => window.languageManager.setLanguage('espanol');
+        }
+        
+        if (btnIngles) {
+            btnIngles.onclick = () => window.languageManager.setLanguage('ingles');
+        }
+
+        // Mantener idioma en todos los enlaces (código existente)
+        const lang = window.languageManager.getCurrentLanguage();
+        const links = document.querySelectorAll('a[href]');
+
+        links.forEach(link => {
+            let href = link.getAttribute('href');
+            if (!href) return;
+
+            // Ignorar si ya tiene lang
+            if (href.includes("lang=")) return;
+
+            // Ignorar externos, anchors, mailto, tel
+            if (
+                href.startsWith("http") ||
+                href.startsWith("mailto:") ||
+                href.startsWith("tel:") ||
+                href.startsWith("#")
+            ) return;
+
+            // Insertar ? o &
+            const join = href.includes("?") ? "&" : "?";
+            link.setAttribute("href", href + join + "lang=" + lang);
+        });
+    });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

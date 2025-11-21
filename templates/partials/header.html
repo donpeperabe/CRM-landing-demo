@@ -1,0 +1,36 @@
+<header class="main-header">
+    <div class="header">
+        <!-- LOGO -->
+        <div class="crm-logo">
+            <a href="{{ url_for('propiedades_list') }}" title="Ir al listado de propiedades">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Terra Zen" class="crm-logo-img">
+            </a>
+        </div>
+
+        <!-- SELECTOR DE IDIOMA -->
+        <div class="language-switcher">
+            <button id="btn-espanol" class="lang-btn" onclick="setLanguage('espanol')">
+                Español
+            </button>
+            <button id="btn-ingles" class="lang-btn" onclick="setLanguage('ingles')">
+                English
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- BARRA DE REDES SOCIALES PERSISTENTE (mantener activa) -->
+<div class="social-bar">
+    <a href="https://www.facebook.com/share/1Cy6eVsvyr/" target="_blank" class="social-btn fb" title="Síguenos en Facebook">
+        <i class="fab fa-facebook-f"></i>
+    </a>
+    <a href="https://www.instagram.com/terra_zen_inmobiliaria?igsh=aW1vdDQ3dDNiaWZz" target="_blank" class="social-btn ig" title="Síguenos en Instagram">
+        <i class="fab fa-instagram"></i>
+    </a>
+    <a href="https://www.tiktok.com/@terrazeninmobiliaria?_t=ZM-90vy3cCRQNf&_r=1" target="_blank" class="social-btn tt" title="Síguenos en TikTok">
+        <i class="fab fa-tiktok"></i>
+    </a>
+    <a href="https://www.linkedin.com/in/terra-zen-48b716346?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="social-btn in" title="Conéctate en LinkedIn">
+        <i class="fab fa-linkedin-in"></i>
+    </a>
+</div>
