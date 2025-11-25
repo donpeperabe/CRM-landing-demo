@@ -177,6 +177,8 @@ header, footer {
 .social-bar .social-btn.ig { 
     background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); 
 }
+/* ELIMINAR ESTAS SECCIONES DUPLICADAS */
+
 /* BARRA DE REDES SOCIALES RESPONSIVE */
 .social-bar {
     position: fixed;
