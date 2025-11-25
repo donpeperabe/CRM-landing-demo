@@ -144,17 +144,22 @@ header, footer {
 .social-bar {
     position: fixed;
     top: 50%;
-    right: 20px;
+    right: 10px;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     z-index: 1000;
+    padding: 12px 6px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px 0 0 20px;
+    box-shadow: -2px 0 15px rgba(0, 0, 0, 0.2);
 }
 
 .social-bar .social-btn {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -162,13 +167,13 @@ header, footer {
     color: white;
     text-decoration: none;
     transition: all 0.3s ease;
-    font-size: 18px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    font-size: 16px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
 }
 
 .social-bar .social-btn:hover {
-    transform: translateX(-5px) scale(1.1);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    transform: translateX(-3px) scale(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 }
 
 .social-bar .social-btn.fb { background-color: #3b5998; }
@@ -177,104 +182,42 @@ header, footer {
 .social-bar .social-btn.ig { 
     background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); 
 }
-/* ELIMINAR ESTAS SECCIONES DUPLICADAS */
 
-/* BARRA DE REDES SOCIALES RESPONSIVE */
-.social-bar {
-    position: fixed;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 15px 8px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    border-radius: 25px 0 0 25px;
-    box-shadow: -2px 0 15px rgba(0, 0, 0, 0.1);
-    margin-right: 0;
-    transition: all 0.3s ease;
-}
-
-.social-btn {
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    color: white;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-size: 18px;
-}
-
-.social-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Colores específicos para cada red social */
-.social-btn.fb { background: #3b5998; }
-.social-btn.ig { background: #e4405f; }
-.social-btn.tt { background: #000000; }
-.social-btn.in { background: #0077b5; }
-
-.social-btn.fb:hover { background: #344e86; }
-.social-btn.ig:hover { background: #d32e4f; }
-.social-btn.tt:hover { background: #333333; }
-.social-btn.in:hover { background: #00669c; }
-
-/* ESTILOS PARA MÓVILES - Barra horizontal en la parte inferior */
+/* ESTILOS PARA MÓVILES - Mantener vertical pero más compacta */
 @media (max-width: 768px) {
     .social-bar {
-        position: fixed;
-        bottom: 0;
-        top: auto;
-        left: 0;
-        right: 0;
-        transform: none;
-        flex-direction: row;
-        justify-content: space-around;
-        border-radius: 0;
-        padding: 12px 10px;
-        background: rgba(255, 255, 255, 0.95);
+        right: 5px;
+        padding: 10px 4px;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.98);
         backdrop-filter: blur(15px);
-        box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
-        border-top: 1px solid #e0e0e0;
+        border-radius: 15px 0 0 15px;
     }
     
-    .social-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-    }
-    
-    /* Efecto de elevación al hacer hover/tap en móviles */
-    .social-btn:active {
-        transform: scale(0.95);
-    }
-}
-
-/* Para pantallas muy pequeñas (móviles pequeños) */
-@media (max-width: 480px) {
-    .social-bar {
-        padding: 10px 5px;
-    }
-    
-    .social-btn {
+    .social-bar .social-btn {
         width: 35px;
         height: 35px;
         font-size: 14px;
     }
+    
+    .social-bar .social-btn:hover,
+    .social-bar .social-btn:active {
+        transform: translateX(-2px) scale(1.05);
+    }
 }
 
-/* Asegurar que no interfiera con el contenido */
-@media (max-width: 768px) {
-    body {
-        padding-bottom: 70px; /* Espacio para la barra social en móviles */
+/* Para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .social-bar {
+        right: 3px;
+        padding: 8px 3px;
+        gap: 5px;
+    }
+    
+    .social-bar .social-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
     }
 }
 
@@ -736,26 +679,6 @@ header, footer {
 
 /* ======= RESPONSIVE ======= */
 @media (max-width: 768px) {
-    .social-bar {
-        position: fixed;
-        bottom: 20px;
-        top: auto;
-        right: 20px;
-        left: auto;
-        transform: none;
-        flex-direction: row;
-    }
-    
-    .social-bar .social-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-    }
-    
-    .social-bar .social-btn:hover {
-        transform: translateY(-5px) scale(1.1);
-    }
-
     .language-switcher {
         flex-wrap: wrap;
     }
@@ -817,6 +740,7 @@ header, footer {
         font-size: 0.9rem;
     }
 }
+
 /* ======= DESCRIPCIÓN CENTRADA COMPLETA ======= */
 .info {
     text-align: center;
