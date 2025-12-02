@@ -19,7 +19,7 @@ app.secret_key = 'clave_secreta_terra_zen_2024'
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Crear directorio de uploads si no existe
+# Crear directorio de uploads
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
@@ -38,7 +38,7 @@ def save_uploaded_images(files):
             if file.content_length > MAX_FILE_SIZE:
                 continue  # Saltar archivos muy grandes
                 
-            # Generar nombre único para evitar colisiones
+            # Generar nombre único 
             filename = secure_filename(file.filename)
             unique_filename = f"{uuid.uuid4().hex}_{filename}"
             
@@ -51,7 +51,7 @@ def save_uploaded_images(files):
     
     return saved_paths
 
-# Ruta para subir imágenes via AJAX (NUEVA RUTA)
+# Ruta para subir imágenes via AJAX 
 @app.route('/upload_images', methods=['POST'])
 def upload_images():
     """Endpoint para subir imágenes"""
@@ -114,7 +114,8 @@ def init_db():
                 descripcion_en TEXT,
                 precio TEXT,
                 ubicacion TEXT,
-                tipo TEXT,
+                tipo_es TEXT,  
+                tipo_en TEXT,
                 estado TEXT DEFAULT 'disponible',
                 imagenes TEXT,
                 whatsapp TEXT,
@@ -224,7 +225,14 @@ def get_all_propiedades():
         
         propiedades = []
         for row in rows:
-            imagenes = json.loads(row[10]) if row[10] else []
+            # IMPORTANTE: El índice de 'imagenes' ha cambiado por las nuevas columnas
+            # Ahora imagenes está en la posición 12 (antes era 10)
+            imagenes_json = row[12] if len(row) > 12 else '[]'
+            try:
+                imagenes = json.loads(imagenes_json) if imagenes_json and imagenes_json != '[]' else []
+            except json.JSONDecodeError:
+                print(f"⚠️ Error decodificando JSON de imágenes para propiedad {row[0]}: {imagenes_json}")
+                imagenes = []
             
             propiedades.append({
                 'id': row[0],
@@ -235,12 +243,14 @@ def get_all_propiedades():
                 'descripcion_en': row[5],
                 'precio': row[6],
                 'ubicacion': row[7],
-                'tipo': row[8],
-                'estado': row[9],
+                'tipo': row[8],           # tipo original para filtros
+                'tipo_es': row[9],        # nuevo campo
+                'tipo_en': row[10],       # nuevo campo
+                'estado': row[11],
                 'imagenes': imagenes,
-                'whatsapp': row[11],
-                'fecha_creacion': row[12],
-                'propietario_nombre': row[14]
+                'whatsapp': row[13],
+                'fecha_creacion': row[14],
+                'propietario_nombre': row[16] if len(row) > 16 else ''
             })
         
         conn.close()
@@ -265,7 +275,13 @@ def get_propiedad_by_id(propiedad_id):
         if not row:
             return None
             
-        imagenes = json.loads(row[10]) if row[10] else []
+        # Índice ajustado para imagenes (posición 12)
+        imagenes_json = row[12] if len(row) > 12 else '[]'
+        try:
+            imagenes = json.loads(imagenes_json) if imagenes_json and imagenes_json != '[]' else []
+        except json.JSONDecodeError:
+            print(f"⚠️ Error decodificando JSON de imágenes: {imagenes_json}")
+            imagenes = []
         
         propiedad = {
             'id': row[0],
@@ -276,12 +292,14 @@ def get_propiedad_by_id(propiedad_id):
             'descripcion_en': row[5],
             'precio': row[6],
             'ubicacion': row[7],
-            'tipo': row[8],
-            'estado': row[9],
+            'tipo': row[8],           # tipo original
+            'tipo_es': row[9],        # nuevo campo
+            'tipo_en': row[10],       # nuevo campo
+            'estado': row[11],
             'imagenes': imagenes,
-            'whatsapp': row[11],
-            'fecha_creacion': row[12],
-            'propietario_nombre': row[14]
+            'whatsapp': row[13],
+            'fecha_creacion': row[14],
+            'propietario_nombre': row[16] if len(row) > 16 else ''
         }
         
         conn.close()
@@ -289,7 +307,7 @@ def get_propiedad_by_id(propiedad_id):
     except Exception as e:
         print(f"Error obteniendo propiedad: {e}")
         return None
-
+            
 def get_propiedades_by_propietario(propietario_id):
     """Obtiene todas las propiedades de un propietario específico"""
     try:
@@ -304,7 +322,12 @@ def get_propiedades_by_propietario(propietario_id):
         
         propiedades = []
         for row in rows:
-            imagenes = json.loads(row[10]) if row[10] else []
+            # Índice ajustado para imagenes (posición 12)
+            imagenes_json = row[12] if len(row) > 12 else '[]'
+            try:
+                imagenes = json.loads(imagenes_json) if imagenes_json and imagenes_json != '[]' else []
+            except json.JSONDecodeError:
+                imagenes = []
             
             propiedades.append({
                 'id': row[0],
@@ -315,11 +338,13 @@ def get_propiedades_by_propietario(propietario_id):
                 'descripcion_en': row[5],
                 'precio': row[6],
                 'ubicacion': row[7],
-                'tipo': row[8],
-                'estado': row[9],
+                'tipo': row[8],           # tipo original
+                'tipo_es': row[9],        # nuevo campo
+                'tipo_en': row[10],       # nuevo campo
+                'estado': row[11],
                 'imagenes': imagenes,
-                'whatsapp': row[11],
-                'fecha_creacion': row[12]
+                'whatsapp': row[13],
+                'fecha_creacion': row[14]
             })
         
         conn.close()
@@ -351,15 +376,30 @@ def save_propietario(propietario):
         return None
 
 def save_propiedad(propiedad):
-    """Guarda una nueva propiedad"""
+    """Guarda una nueva propiedad con traducciones automáticas"""
     try:
+        # Diccionario de traducciones
+        tipo_translations = {
+            'terreno': {'es': 'Terreno', 'en': 'Land'},
+            'casa': {'es': 'Casa', 'en': 'House'},
+            'apartamento': {'es': 'Apartamento', 'en': 'Apartment'},
+            'local': {'es': 'Local Comercial', 'en': 'Commercial premises'},
+            'oficina': {'es': 'Oficina', 'en': 'Office'},
+        }
+        
+        tipo_valor = propiedad.get('tipo', 'terreno')
+        
+        # Generar traducciones automáticamente
+        tipo_es = tipo_translations.get(tipo_valor, {}).get('es', tipo_valor.title())
+        tipo_en = tipo_translations.get(tipo_valor, {}).get('en', tipo_valor.title())
+        
         conn = sqlite3.connect(get_db_path())
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO propiedades (propietario_id, titulo_es, descripcion_es, titulo_en, descripcion_en, 
-                                   precio, ubicacion, tipo, estado, imagenes, whatsapp, fecha_creacion)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
+    INSERT INTO propiedades (propietario_id, titulo_es, descripcion_es, titulo_en, descripcion_en, 
+                           precio, ubicacion, tipo, tipo_es, tipo_en, estado, imagenes, whatsapp, fecha_creacion)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+''', (
             propiedad['propietario_id'],
             propiedad['titulo_es'],
             propiedad.get('descripcion_es', ''),
@@ -367,7 +407,9 @@ def save_propiedad(propiedad):
             propiedad.get('descripcion_en', ''),
             propiedad.get('precio', ''),
             propiedad.get('ubicacion', ''),
-            propiedad.get('tipo', 'terreno'),
+            tipo_valor,  # tipo original para filtros
+            tipo_es,     # tipo en español
+            tipo_en,     # tipo en inglés
             propiedad.get('estado', 'disponible'),
             json.dumps(propiedad.get('imagenes', [])),
             propiedad.get('whatsapp', ''),
@@ -404,23 +446,41 @@ def update_propietario(propietario_id, datos):
         return False
 
 def update_propiedad(propiedad_id, datos):
-    """Actualiza una propiedad existente"""
+    """Actualiza una propiedad existente con traducciones automáticas"""
     try:
+        # Diccionario de traducciones (mismo que en save_propiedad)
+        tipo_translations = {
+            'terreno': {'es': 'Terreno', 'en': 'Land'},
+            'casa': {'es': 'Casa', 'en': 'House'},
+            'apartamento': {'es': 'Apartamento', 'en': 'Apartment'},
+            'local': {'es': 'Local Comercial', 'en': 'Commercial premises'},
+            'oficina': {'es': 'Oficina', 'en': 'Office'},
+        }
+        
+        tipo_valor = datos.get('tipo', 'terreno')
+        
+        # Generar traducciones automáticamente
+        tipo_es = tipo_translations.get(tipo_valor, {}).get('es', tipo_valor.title())
+        tipo_en = tipo_translations.get(tipo_valor, {}).get('en', tipo_valor.title())
+        
         conn = sqlite3.connect(get_db_path())
         cursor = conn.cursor()
         cursor.execute('''
-            UPDATE propiedades 
-            SET titulo_es = ?, descripcion_es = ?, titulo_en = ?, descripcion_en = ?,
-                precio = ?, ubicacion = ?, tipo = ?, estado = ?, imagenes = ?, whatsapp = ?
-            WHERE id = ? AND activo = 1
-        ''', (
+    UPDATE propiedades 
+    SET titulo_es = ?, descripcion_es = ?, titulo_en = ?, descripcion_en = ?,
+        precio = ?, ubicacion = ?, tipo = ?, tipo_es = ?, tipo_en = ?, 
+        estado = ?, imagenes = ?, whatsapp = ?
+    WHERE id = ? AND activo = 1
+''', (
             datos['titulo_es'],
             datos.get('descripcion_es', ''),
             datos['titulo_en'],
             datos.get('descripcion_en', ''),
             datos.get('precio', ''),
             datos.get('ubicacion', ''),
-            datos.get('tipo', 'terreno'),
+            tipo_valor,     # tipo original para filtros
+            tipo_es,        # tipo en español
+            tipo_en,        # tipo en inglés
             datos.get('estado', 'disponible'),
             json.dumps(datos.get('imagenes', [])),
             datos.get('whatsapp', ''),
@@ -579,11 +639,12 @@ def propiedades_list():
 
     for p in propiedades:
 
-        tipo = (p.get('tipo') or '').lower()
+        tipo_es = (p.get('tipo_es') or '').lower()
+        tipo_en = (p.get('tipo_en') or '').lower()
         ubicacion = (p.get('ubicacion') or '').lower()
         precio = parse_price(p.get('precio'))
 
-        if filtro_tipo and filtro_tipo != tipo:
+        if filtro_tipo and filtro_tipo != tipo_es and filtro_tipo != tipo_en:
             continue
 
         if filtro_ubicacion and filtro_ubicacion not in ubicacion:
