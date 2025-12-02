@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Propiedad - CRM Terra Zen</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    {% if not propietarios %}
+    <div style="
+        background-color: #442;
+        border: 1px solid #ff6b6b;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        color: #ffd2d2;
+        text-align: center;">
+        ⚠️ No se puede crear una propiedad sin tener al menos un propietario registrado.<br><br>
+        <a href="/crm/propietarios/nuevo"
+           style="color: #ffd700; text-decoration: underline; font-weight: bold;">
+           ➕ Agregar propietario ahora
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('input, select, textarea, button[type="submit"]').forEach(function (el) {
+                el.disabled = true;
+                el.style.opacity = '0.6';
+                el.style.cursor = 'not-allowed';
+            });
+        });
+    </script>
+    {% endif %}
+
+    <div class="crm-container">
+        <!-- Header -->
+        <div class="crm-header">
+            <h1>
+                <i class="fas fa-home"></i>
+                {% if language == 'ingles' %}
+                    New Property
+                {% else %}
+                    Nueva Propiedad
+                {% endif %}
+            </h1>
+            <p>
+                {% if language == 'ingles' %}
+                    Add a new property to the system
+                {% else %}
+                    Agrega una nueva propiedad al sistema
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Formulario -->
+        <div class="form-container">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="propietario_id" class="required-field">
+                        <i class="fas fa-user-tie"></i>
+                        {% if language == 'ingles' %}
+                            Owner
+                        {% else %}
+                            Propietario
+                        {% endif %}
+                    </label>
+                    <select id="propietario_id" name="propietario_id" required>
+                        <option value="">
+                            {% if language == 'ingles' %}
+                                Select owner
+                            {% else %}
+                                Seleccionar propietario
+                            {% endif %}
+                        </option>
+                        {% for prop in propietarios %}
+                        <option value="{{ prop.id }}">{{ prop.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="field-info">
+                        {% if language == 'ingles' %}
+                            Select the property's owner (required)
+                        {% else %}
+                            Selecciona el propietario de esta propiedad (obligatorio)
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="titulo_es" class="required-field">
+                            <i class="fas fa-heading"></i> Título (Español)
+                        </label>
+                        <input type="text" id="titulo_es" name="titulo_es" 
+                               placeholder="Ej: Terreno en Monterrico" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="titulo_en" class="required-field">
+                            <i class="fas fa-heading"></i> Title (English)
+                        </label>
+                        <input type="text" id="titulo_en" name="titulo_en" 
+                               placeholder="Ej: Land in Monterrico" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="descripcion_es">
+                            <i class="fas fa-align-left"></i> Descripción (Español)
+                        </label>
+                        <textarea id="descripcion_es" name="descripcion_es" 
+                                  placeholder="Describe la propiedad en español"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="descripcion_en">
+                            <i class="fas fa-align-left"></i> Description (English)
+                        </label>
+                        <textarea id="descripcion_en" name="descripcion_en" 
+                                  placeholder="Describe the property in English"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="precio">
+                            <i class="fas fa-tag"></i> Precio/Price
+                        </label>
+                        <input type="text" id="precio" name="precio" 
+                               placeholder="Ej: $26,700">
+                        <div class="field-info">Formato libre: $26,700, €25,000, etc.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ubicacion">
+                            <i class="fas fa-map-marker-alt"></i> Ubicación/Location
+                        </label>
+                        <input type="text" id="ubicacion" name="ubicacion" 
+                               placeholder="Ej: Monterrico, Guatemala">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+    <div class="form-group">
+        <label for="tipo">
+            <i class="fas fa-home"></i> 
+            {% if language == 'ingles' %}
+                Property Type
+            {% else %}
+                Tipo de Propiedad
+            {% endif %}
+        </label>
+        <select id="tipo" name="tipo">
+            <option value="terreno">Terreno/Land</option>
+            <option value="casa">Casa/House</option>
+            <option value="apartamento">Apartamento/Apartment</option>
+            <option value="local">Local Comercial/Commercial premises</option>
+            <option value="oficina">Oficina/Office</option>
+        </select>
+    </div>
+</div>                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="estado">
+                            <i class="fas fa-info-circle"></i> Estado/Status
+                        </label>
+                        <select id="estado" name="estado">
+                            <option value="disponible" selected>Disponible/Available</option>
+                            <option value="reservado">Reservado/Reserved</option>
+                            <option value="vendido">Vendido/Sold</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="whatsapp">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </label>
+                    <input type="text" id="whatsapp" name="whatsapp" 
+                           placeholder="Ej: 50244851125">
+                    <div class="field-info">Solo números, sin símbolos. Ej: 50244851125</div>
+                </div>
+                    
+                <!-- Área de subida de archivos -->
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-images"></i>
+                        {% if language == 'ingles' %}
+                            Images
+                        {% else %}
+                            Imágenes
+                        {% endif %}
+                    </label>
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #666; margin-bottom: 10px;"></i>
+                        <p>
+                            {% if language == 'ingles' %}
+                                Click here or drag images to upload
+                            {% else %}
+                                Haz clic aquí o arrastra imágenes para subirlas
+                            {% endif %}
+                        </p>
+                        <p class="upload-info">
+                            {% if language == 'ingles' %}
+                                Formats: JPG, PNG, GIF, WEBP (Max 16MB per image)
+                            {% else %}
+                                Formatos: JPG, PNG, GIF, WEBP (Máx. 16MB por imagen)
+                            {% endif %}
+                        </p>
+                        <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;">
+                    </div>
+                    
+                    <!-- Vista previa de imágenes -->
+                    <div class="image-previews" id="imagePreviews" style="display: none;">
+                        <h4 style="color: #ffd700; margin: 15px 0 10px 0;">
+                            {% if language == 'ingles' %}
+                                Uploaded images:
+                            {% else %}
+                                Imágenes subidas:
+                            {% endif %}
+                        </h4>
+                        <div id="previewContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 10px;"></div>
+                    </div>
+                    
+                    <!-- Campo oculto para almacenar las rutas -->
+                    <textarea id="imagenes" name="imagenes" style="display: none;"></textarea>
+                    
+                    <div class="field-info">
+                        {% if language == 'ingles' %}
+                            Images will be saved automatically on the server
+                        {% else %}
+                            Las imágenes se guardarán automáticamente en el servidor
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i>
+                        {% if language == 'ingles' %}
+                            Save Property
+                        {% else %}
+                            Guardar Propiedad
+                        {% endif %}
+                    </button>
+                    <a href="/crm/propiedades" class="btn-secondary">
+                        <i class="fas fa-times"></i>
+                        {% if language == 'ingles' %}
+                            Cancel
+                        {% else %}
+                            Cancelar
+                        {% endif %}
+                    </a>
+                </div>
+            </form>
+            
+            <!-- Información adicional -->
+            <div style="text-align: center; color: #888; font-size: 0.9rem;">
+                <p>
+                    <i class="fas fa-lightbulb"></i>
+                    {% if language == 'ingles' %}
+                        The property will be available immediately on the public site
+                    {% else %}
+                        La propiedad estará disponible inmediatamente en el sitio público
+                    {% endif %}
+                </p>
+                <p>
+                    <i class="fas fa-info-circle"></i>
+                    {% if language == 'ingles' %}
+                        Fields marked with * are required
+                    {% else %}
+                        Los campos marcados con * son obligatorios
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .upload-area {
+            border: 2px dashed #444;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background: #2a2a2a;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+        
+        .upload-area:hover {
+            border-color: #ffd700;
+            background: #2f2f2f;
+        }
+        
+        .upload-area.dragover {
+            border-color: #25d366;
+            background: #2a2a2a;
+        }
+        
+        .upload-info {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .image-preview {
+            position: relative;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+            border: none;
+                    border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .upload-progress {
+            margin-top: 10px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(135deg, #ffd700, #ff6b00);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tituloEs = document.getElementById('titulo_es');
+            const tituloEn = document.getElementById('titulo_en');
+            const descripcionEs = document.getElementById('descripcion_es');
+            const descripcionEn = document.getElementById('descripcion_en');
+            const tipoEs = document.getElementById('tipo_es');
+            const tipoEn = document.getElementById('tipo_en');
+
+            // Botón español → inglés
+            const btnEsEn = document.createElement('button');
+            btnEsEn.type = 'button';
+            btnEsEn.innerHTML = '<i class="fas fa-robot"></i> Traducir a Inglés';
+            btnEsEn.className = 'btn-secondary';
+            btnEsEn.style.marginRight = '10px';
+            btnEsEn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            btnEsEn.style.color = 'white';
+
+            // Botón inglés → español
+            const btnEnEs = document.createElement('button');
+            btnEnEs.type = 'button';
+            btnEnEs.innerHTML = '<i class="fas fa-language"></i> Traducir a Español';
+            btnEnEs.className = 'btn-secondary';
+            btnEnEs.style.background = 'linear-gradient(135deg, #43cea2, #185a9d)';
+            btnEnEs.style.color = 'white';
+
+            // Insertar botones debajo del primer campo
+            const secondFormRow = document.querySelectorAll('.form-row')[1];
+            secondFormRow.insertAdjacentElement('afterend', btnEsEn);
+            btnEsEn.insertAdjacentElement('afterend', btnEnEs);
+
+            // --- Función general de traducción (simulada)
+            function traducirTexto(texto, direccion) {
+                if (!texto) return '';
+                let t = texto;
+
+                // Traducciones básicas (igual que antes, pero bidireccional)
+                const diccionario = {
+                    // Español → Inglés
+                    es: {
+                        'terreno': 'land', 'casa': 'house', 'finca': 'farm', 'lote': 'lot',
+                        'apartamento': 'apartment', 'departamento': 'apartment',
+                        'local': 'commercial space', 'oficina': 'office',
+                        'venta': 'for sale', 'renta': 'for rent', 'alquiler': 'for rent',
+                        'excelente': 'excellent', 'bonita': 'pretty', 'hermosa': 'beautiful',
+                        'amplia': 'spacious', 'moderna': 'modern', 'ubicación': 'location',
+                        'cerca': 'near', 'playa': 'beach', 'mar': 'sea', 'montaña': 'mountain',
+                        'habitaciones': 'bedrooms', 'baños': 'bathrooms', 'jardín': 'garden',
+                        'piscina': 'pool', 'terraza': 'terrace', 'balcón': 'balcony',
+                        'en': 'in', 'con': 'with', 'sin': 'without'
+                    },
+                    // Inglés → Español
+                    en: {
+                        'land': 'terreno', 'house': 'casa', 'farm': 'finca', 'lot': 'lote',
+                        'apartment': 'apartamento', 'commercial': 'comercial',
+                        'office': 'oficina', 'space': 'espacio',
+                        'for sale': 'en venta', 'for rent': 'en alquiler', 'excellent': 'excelente',
+                        'pretty': 'bonita', 'beautiful': 'hermosa', 'spacious': 'amplia',
+                        'modern': 'moderna', 'location': 'ubicación', 'near': 'cerca',
+                        'beach': 'playa', 'sea': 'mar', 'mountain': 'montaña',
+                        'bedrooms': 'habitaciones', 'bathrooms': 'baños', 'garden': 'jardín',
+                        'pool': 'piscina', 'terrace': 'terraza', 'balcony': 'balcón',
+                        'in': 'en', 'with': 'con', 'without': 'sin'
+                    }
+                };
+
+                const mapa = diccionario[direccion];
+                for (const [origen, destino] of Object.entries(mapa)) {
+                    const regex = new RegExp(`\\b${origen}\\b`, 'gi');
+                    t = t.replace(regex, destino);
+                }
+
+                return t;
+            }
+
+            // --- Acción Español → Inglés
+            btnEsEn.addEventListener('click', function() {
+                if (!tituloEs.value.trim() && !descripcionEs.value.trim() && !tipoEs.value.trim()) {
+                    alert('Ingresa texto en español para traducir.');
+                    return;
+                }
+                tituloEn.value = traducirTexto(tituloEs.value, 'es');
+                descripcionEn.value = traducirTexto(descripcionEs.value, 'es');
+                tipoEn.value = traducirTexto(tipoEs.value, 'es');
+                alert('✓ Texto traducido al inglés (simulado)');
+            });
+
+            // --- Acción Inglés → Español
+            btnEnEs.addEventListener('click', function() {
+                if (!tituloEn.value.trim() && !descripcionEn.value.trim() && !tipoEn.value.trim()) {
+                    alert('Enter English text to translate.');
+                    return;
+                }
+                tituloEs.value = traducirTexto(tituloEn.value, 'en');
+                descripcionEs.value = traducirTexto(descripcionEn.value, 'en');
+                tipoEs.value = traducirTexto(tipoEn.value, 'en');
+                alert('✓ Texto traducido al español (simulado)');
+            });
+        });
+    </script>
+
+    <!-- Sistema de subida de imágenes (mantenemos el mismo) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const imagePreviews = document.getElementById('imagePreviews');
+            const previewContainer = document.getElementById('previewContainer');
+            const imagenesTextarea = document.getElementById('imagenes');
+            let uploadedPaths = [];
+            
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+            
+            function handleFiles(files) {
+                if (files.length === 0) return;
+                
+                const formData = new FormData();
+                for (let file of files) {
+                    formData.append('images[]', file);
+                }
+                
+                showUploadProgress();
+                
+                fetch('/upload_images', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    hideUploadProgress();
+                    
+                    if (data.success) {
+                        uploadedPaths = [...uploadedPaths, ...data.paths];
+                        updateImageTextarea();
+                        updatePreviews();
+                        showNotification(data.message, 'success');
+                    } else {
+                        showNotification('Error: ' + data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    hideUploadProgress();
+                    showNotification('Error de conexión: ' + error.message, 'error');
+                });
+            }
+            
+            function updateImageTextarea() {
+                imagenesTextarea.value = uploadedPaths.join(',');
+            }
+            
+            function updatePreviews() {
+                if (uploadedPaths.length === 0) {
+                    imagePreviews.style.display = 'none';
+                    return;
+                }
+                
+                imagePreviews.style.display = 'block';
+                previewContainer.innerHTML = '';
+                
+                uploadedPaths.forEach((path, index) => {
+                    const preview = document.createElement('div');
+                    preview.className = 'image-preview';
+                    preview.innerHTML = `
+                        <img src="/static/${path}" alt="Preview" onerror="this.src='/static/images/placeholder.jpg'">
+                        <button type="button" class="remove-image" onclick="removeImage(${index})">×</button>
+                    `;
+                    previewContainer.appendChild(preview);
+                });
+            }
+            
+            function showUploadProgress() {
+                uploadArea.innerHTML = `
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #ffd700; margin-bottom: 10px;"></i>
+                    <p>Subiendo imágenes...</p>
+                    <div class="upload-progress">
+                        <div class="progress-bar"></div>
+                    </div>
+                `;
+            }
+            
+            function hideUploadProgress() {
+                uploadArea.innerHTML = `
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #666; margin-bottom: 10px;"></i>
+                    <p>Haz clic aquí o arrastra imágenes para subirlas</p>
+                    <p class="upload-info">Formatos: JPG, PNG, GIF, WEBP (Máx. 16MB por imagen)</p>
+                `;
+            }
+            
+            function showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    color: white;
+                    font-weight: 600;
+                    z-index: 1000;
+                    max-width: 300px;
+                    ${type === 'success' ? 'background: linear-gradient(135deg, #25d366, #128c7e);' : 'background: linear-gradient(135deg, #ff6b6b, #ee5a52);'}
+                `;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 4000);
+            }
+            
+            window.removeImage = function(index) {
+                uploadedPaths.splice(index, 1);
+                updateImageTextarea();
+                updatePreviews();
+            };
+            
+            if (imagenesTextarea.value) {
+                uploadedPaths = imagenesTextarea.value.split(',').filter(path => path.trim() !== '');
+                updatePreviews();
+            }
+        });
+    </script>
+</body>
+</html>

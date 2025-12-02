@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block content %}  
+    <div class="info">
+        <!-- ====== CONTENIDO EN ESPAÑOL ====== -->
+        <div id="content-espanol" class="language-content">
+            <h1>Nuestras Propiedades</h1>
+            <p>Descubre las mejores oportunidades de inversión</p>
+
+            <!-- ========= FILTROS ========= -->
+            <form id="filtersFormEs" method="GET" class="filters-container">
+                <input type="hidden" name="lang" value="espanol">
+                <select name="tipo" class="filter-input">
+                    <option value="" {% if not filtro_tipo %}selected{% endif %}>Tipo de propiedad</option>
+                    <option value="terreno" {% if filtro_tipo == 'terreno' %}selected{% endif %}>Terreno</option>
+                    <option value="casa" {% if filtro_tipo == 'casa' %}selected{% endif %}>Casa</option>
+                    <option value="apartamento" {% if filtro_tipo == 'apartamento' %}selected{% endif %}>Apartamento</option>
+                    <option value="local comercial" {% if filtro_tipo == 'local comercial' %}selected{% endif %}>Local Comercial</option>
+                    <option value="oficina" {% if filtro_tipo == 'oficina' %}selected{% endif %}>Oficina</option>
+                </select>
+
+                <!--select name="ubicacion" class="filter-input">
+                    <option value="">Ubicación</option>
+                    <option value="monterrico" {% if filtro_ubicacion == 'monterrico' %}selected{% endif %}>Monterrico</option>
+                    <option value="guatemala" {% if filtro_ubicacion == 'guatemala' %}selected{% endif %}>Guatemala</option>
+                    <option value="antigua" {% if filtro_ubicacion == 'antigua' %}selected{% endif %}>Antigua</option>
+                </select>-->
+
+                <select name="precio" class="filter-input">
+                    <option value="">Rango de precio</option>
+                    <option value="1-100000" {% if filtro_precio == '1-100000' %}selected{% endif %}>Hasta Q100,000</option>
+                    <option value="100000-200000" {% if filtro_precio == '100000-200000' %}selected{% endif %}>Q100,000 a Q200,000</option>
+                    <option value="200000-500000" {% if filtro_precio == '200000-500000' %}selected{% endif %}>Q200,000 a Q500,000</option>
+                    <option value="500000-1000000" {% if filtro_precio == '500000-1000000' %}selected{% endif %}>Más de Q500,000</option>
+                </select>
+
+                <button type="submit" class="btn-primary" style="padding: 8px 20px;">
+                    Filtrar
+                </button>
+            </form>
+
+            <div class="properties-grid">
+                {% for propiedad in propiedades %}
+                <div class="property-card" data-href="{{ url_for('propiedad_detalle', propiedad_id=propiedad.id) }}">
+                    {% if propiedad.imagenes and propiedad.imagenes|length > 0 %}
+                    <div class="property-image">
+                        <img src="{{ url_for('static', filename=propiedad.imagenes[0]) }}" alt="{{ propiedad.titulo_es }}">
+                    </div>
+                    {% else %}
+                    <div class="property-image">
+                        <div class="no-image">
+                            <i class="fas fa-home"></i>
+                            <p>Imagen no disponible</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="property-info">
+                        <h3>{{ propiedad.titulo_es }}</h3>
+                        <p class="property-location">
+                            <i class="fas fa-map-marker-alt"></i> {{ propiedad.ubicacion or 'Ubicación no especificada' }}
+                        </p>
+                        <p class="property-price">{{ propiedad.precio or 'Consultar precio' }}</p>
+                        <p class="property-type"><i class="fas fa-home"></i> {{ propiedad.tipo_es|title }}</p>
+                        <p class="property-status {{ propiedad.estado }}">
+                            <span class="status-dot"></span>
+                            {{ propiedad.estado|capitalize }}
+                        </p>
+
+                        <div class="property-actions">
+                            <a href="{{ url_for('propiedad_detalle', propiedad_id=propiedad.id) }}" class="btn-view">
+                                Ver Detalles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-home"></i>
+                    <h3>No hay propiedades disponibles</h3>
+                    <p>Próximamente tendremos nuevas oportunidades</p>
+                    <a href="/crm/login" class="btn-primary" style="margin-top: 15px;">
+                        <i class="fas fa-plus"></i> Agregar Propiedades (CRM)
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ====== ENGLISH VERSION ====== -->
+        <div id="content-ingles" class="language-content" style="display: none;">
+            <h1>Our Properties</h1>
+            <p>Discover the best investment opportunities</p>
+
+            <!-- ========= FILTERS ========= -->
+            <form id="filtersFormEn" method="GET" class="filters-container">
+                <input type="hidden" name="lang" value="ingles">
+                <select name="tipo" class="filter-input">
+                    <option value="" {% if not filtro_tipo %}selected{% endif %}>Property type</option>
+                    <option value="terreno" {% if filtro_tipo == 'terreno' %}selected{% endif %}>Land</option>
+                    <option value="casa" {% if filtro_tipo == 'casa' %}selected{% endif %}>House</option>
+                    <option value="apartamento" {% if filtro_tipo == 'apartamento' %}selected{% endif %}>Apartment</option>
+                    <option value="local comercial" {% if filtro_tipo == 'local comercial' %}selected{% endif %}>Commercial premises</option>
+                    <option value="oficina" {% if filtro_tipo == 'oficina' %}selected{% endif %}>Office</option>
+                </select>
+
+                <!--select name="ubicacion" class="filter-input">
+                    <option value="">Location</option>
+                    <option value="monterrico" {% if filtro_ubicacion == 'monterrico' %}selected{% endif %}>Monterrico</option>
+                    <option value="guatemala" {% if filtro_ubicacion == 'guatemala' %}selected{% endif %}>Guatemala</option>
+                    <option value="antigua" {% if filtro_ubicacion == 'antigua' %}selected{% endif %}>Antigua</option>
+                </select>-->
+
+                <select name="precio" class="filter-input">
+                    <option value="">Price range</option>
+                    <option value="1-100000" {% if filtro_precio == '1-100000' %}selected{% endif %}>Up to Q100,000</option>
+                    <option value="100000-200000" {% if filtro_precio == '100000-200000' %}selected{% endif %}>Q100,000 to Q200,000</option>
+                    <option value="200000-500000" {% if filtro_precio == '200000-500000' %}selected{% endif %}>Q200,000 to Q500,000</option>
+                    <option value="500000-1000000" {% if filtro_precio == '500000-1000000' %}selected{% endif %}>More than Q500,000</option>
+                </select>
+                
+                <button type="submit" class="btn-primary" style="padding: 8px 20px;">
+                    Filter
+                </button>
+            </form>
+
+            <div class="properties-grid">
+                {% for propiedad in propiedades %}
+                <div class="property-card" data-href="{{ url_for('propiedad_detalle', propiedad_id=propiedad.id) }}">
+                    {% if propiedad.imagenes and propiedad.imagenes|length > 0 %}
+                    <div class="property-image">
+                        <img src="{{ url_for('static', filename=propiedad.imagenes[0]) }}" alt="{{ propiedad.titulo_en or propiedad.titulo_es }}">
+                    </div>
+                    {% else %}
+                    <div class="property-image">
+                        <div class="no-image">
+                            <i class="fas fa-home"></i>
+                            <p>Image not available</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="property-info">
+                        <h3>{{ propiedad.titulo_en or propiedad.titulo_es }}</h3>
+                        <p class="property-location">
+                            <i class="fas fa-map-marker-alt"></i> {{ propiedad.ubicacion or 'Location not specified' }}
+                        </p>
+                        <p class="property-price">{{ propiedad.precio or 'Price upon request' }}</p>
+                        <p class="property-type"><i class="fas fa-home"></i> {{ propiedad.tipo_en|title }}</p>
+                        <p class="property-status {{ propiedad.estado }}">
+                            <span class="status-dot"></span>
+                            {% if propiedad.estado == 'disponible' %}
+                                Available
+                            {% elif propiedad.estado == 'reservado' %}
+                                Reserved
+                            {% elif propiedad.estado == 'vendido' %}
+                                Sold
+                            {% else %}
+                                Not specified
+                            {% endif %}
+                        </p>
+                        <div class="property-actions">
+                            <a href="{{ url_for('propiedad_detalle', propiedad_id=propiedad.id) }}" class="btn-view">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-home"></i>
+                    <h3>No properties available</h3>
+                    <p>New opportunities coming soon</p>
+                    <a href="/crm/login" class="btn-primary" style="margin-top: 15px;">
+                        <i class="fas fa-plus"></i> Add Properties (CRM)
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <a href="{{ url_for('crm_login') }}" class="btn-primary" style="display: block; margin: 20px auto; text-align: center; max-width: 200px;">
+        CRM
+    </a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Solo funcionalidades específicas de esta página
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hacer las cards clickeables
+        document.querySelectorAll('.property-card').forEach(card => {
+            card.addEventListener('click', function(event) {
+                if (!event.target.closest('.property-actions')) {
+                    const href = this.getAttribute('data-href');
+                    if (href) {
+                        window.location.href = href;
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
