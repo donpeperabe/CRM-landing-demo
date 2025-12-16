@@ -243,9 +243,9 @@ def get_all_propiedades():
                 'descripcion_en': row[5],
                 'precio': row[6],
                 'ubicacion': row[7],
-                'tipo': row[8],           # tipo original para filtros
-                'tipo_es': row[9],        # nuevo campo
-                'tipo_en': row[10],       # nuevo campo
+                'tipo': row[8],          
+                'tipo_es': row[9],
+                'tipo_en': row[10],
                 'estado': row[11],
                 'imagenes': imagenes,
                 'whatsapp': row[13],
@@ -292,9 +292,9 @@ def get_propiedad_by_id(propiedad_id):
             'descripcion_en': row[5],
             'precio': row[6],
             'ubicacion': row[7],
-            'tipo': row[8],           # tipo original
-            'tipo_es': row[9],        # nuevo campo
-            'tipo_en': row[10],       # nuevo campo
+            'tipo': row[8],
+            'tipo_es': row[9],
+            'tipo_en': row[10],
             'estado': row[11],
             'imagenes': imagenes,
             'whatsapp': row[13],
@@ -338,9 +338,9 @@ def get_propiedades_by_propietario(propietario_id):
                 'descripcion_en': row[5],
                 'precio': row[6],
                 'ubicacion': row[7],
-                'tipo': row[8],           # tipo original
-                'tipo_es': row[9],        # nuevo campo
-                'tipo_en': row[10],       # nuevo campo
+                'tipo': row[8],
+                'tipo_es': row[9],
+                'tipo_en': row[10],
                 'estado': row[11],
                 'imagenes': imagenes,
                 'whatsapp': row[13],
@@ -407,9 +407,9 @@ def save_propiedad(propiedad):
             propiedad.get('descripcion_en', ''),
             propiedad.get('precio', ''),
             propiedad.get('ubicacion', ''),
-            tipo_valor,  # tipo original para filtros
-            tipo_es,     # tipo en español
-            tipo_en,     # tipo en inglés
+            tipo_valor,
+            tipo_es,
+            tipo_en,
             propiedad.get('estado', 'disponible'),
             json.dumps(propiedad.get('imagenes', [])),
             propiedad.get('whatsapp', ''),
@@ -478,9 +478,9 @@ def update_propiedad(propiedad_id, datos):
             datos.get('descripcion_en', ''),
             datos.get('precio', ''),
             datos.get('ubicacion', ''),
-            tipo_valor,     # tipo original para filtros
-            tipo_es,        # tipo en español
-            tipo_en,        # tipo en inglés
+            tipo_valor,
+            tipo_es,
+            tipo_en,
             datos.get('estado', 'disponible'),
             json.dumps(datos.get('imagenes', [])),
             datos.get('whatsapp', ''),
@@ -1047,4 +1047,5 @@ create_default_crm_user()
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
+
 
