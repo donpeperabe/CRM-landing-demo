@@ -15,7 +15,7 @@ def get_db_connection():
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = 'clave_secreta_terra_zen_2024'
 
-# ========== CONFIGURACIÓN DE UPLOADS==========
+# Uploads
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -77,11 +77,11 @@ def upload_images():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
-# ========== CONFIGURACIÓN ==========
+# CONFIGURACIÓN 
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# ========== BASE DE DATOS ==========
+# BASE DE DATOS
 def get_db_path():
     return 'terrazen.db'
 
@@ -184,7 +184,7 @@ def create_default_crm_user():
     except Exception as e:
         print(f"❌ Error creando usuario por defecto: {e}")
 
-# ========== FUNCIONES DE BASE DE DATOS ==========
+# FUNCIONES DE BASE DE DATOS
 def get_all_propietarios():
     """Obtiene todos los propietarios activos"""
     try:
@@ -591,7 +591,7 @@ def save_prospect(prospect):
         print(f"Error guardando prospecto: {e}")
         return False
 
-# ========== RUTAS PÚBLICAS ==========
+# RUTAS PÚBLICAS
 @app.route('/')
 def home():
     """Página principal - Redirige según autenticación"""
@@ -690,7 +690,7 @@ def propiedad_detalle(propiedad_id):
     
     return render_template('propiedad_landing.html', propiedad=propiedad)
 
-# --- CONFIGURACIÓN DE IDIOMA GLOBAL ---
+# CONFIGURACIÓN DE IDIOMA GLOBAL 
 @app.route('/set_language/<language>')
 def set_language(language):
     if language in ['espanol', 'ingles']:
@@ -755,7 +755,7 @@ def thank_you():
     language = session.get('language', 'espanol')
     return render_template('thank_you.html', language=language)
 
-# ========== RUTAS CRM ==========
+# RUTAS CRM
 @app.route('/crm/login', methods=['GET', 'POST'])
 def crm_login():
     """Login para el sistema CRM"""
@@ -1030,7 +1030,7 @@ def crm_logout():
     session.pop('crm_user', None)
     return redirect(url_for('home'))
 
-# ========== RUTAS DE PROSPECTOS (SIMPLIFICADO) ==========
+# RUTAS DE PROSPECTOS (SIMPLIFICADO)
 @app.route('/prospectos')
 def admin_prospectos():
     """Vista de prospectos - solo para usuarios CRM logueados"""
@@ -1040,10 +1040,11 @@ def admin_prospectos():
     prospects = load_prospects()
     return render_template('admin_prospectos.html', prospects=prospects)
 
-# ========== INICIALIZACIÓN ==========
+# INICIALIZACIÓN
 init_db()
 create_default_crm_user()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
+
